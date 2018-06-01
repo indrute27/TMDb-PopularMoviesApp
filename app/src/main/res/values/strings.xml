@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="detail_name">Movie Details</string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="no_movies">No films found</string>
+    <string name="movie_poster">Movie poster</string>
+    <string name="mostPopular">Most Popular</string>
+    <string name="highestRated">Highest Rated</string>
+    <string name="trailer">Youtube Trailer</string>
+    <string name="trailer1">Trailer 1</string>
+    <string name="trailerLabel">Trailers</string>
+    <string name="trailerReviews">Reviews</string>
+</resources>

@@ -1,0 +1,6 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/sortPopularity"
+        android:title="@string/mostPopular"/>
+    <item android:id="@+id/sortRating"
+        android:title="@string/highestRated" />
+</menu>
