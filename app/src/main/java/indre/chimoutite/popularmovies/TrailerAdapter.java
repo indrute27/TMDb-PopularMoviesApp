@@ -10,19 +10,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by indre on 5/31/18. Custom adapter for trailers and recycler view.
  */
 
 public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHolder> {
-    private ArrayList<String> trailer;
+    private List<Trailer> trailer;
     private Context context;
     TextView trailerTitle;
     private ItemClickListener mClickListener;
 
-    public TrailerAdapter(Context context, ArrayList<String> trailer) {
+    public TrailerAdapter(Context context, List<Trailer> trailer) {
         this.trailer = trailer;
         this.context = context;
     }
@@ -36,7 +36,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(TrailerAdapter.ViewHolder viewHolder, int i) {
-        trailerTitle.setText("Trailer " + (viewHolder.getAdapterPosition() + 1));
+        trailerTitle.setText(trailer.get(i).getmName());
     }
 
     @Override
@@ -53,12 +53,12 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
         @Override
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
-            watchYoutubeTrailer(context, trailer.get(getAdapterPosition()));
+            watchYoutubeTrailer(context, trailer.get(getAdapterPosition()).getmId());
         }
     }
 
     // Since recyclerview doesn't have clear or add all functionality make a new method
-    public void swap(ArrayList<String> newTrailers) {
+    public void swap(List<Trailer> newTrailers) {
         if (trailer != null) {
             trailer.clear();
             trailer.addAll(newTrailers);

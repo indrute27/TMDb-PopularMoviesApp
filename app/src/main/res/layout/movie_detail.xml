@@ -12,10 +12,10 @@
         <TextView
             android:id="@+id/detailMovieTitle"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="125dp"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:textSize="36sp"
+            android:textSize="34sp"
             android:gravity="center_vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -53,6 +53,17 @@
             app:layout_constraintStart_toStartOf="@+id/detailReleaseDate"
             app:layout_constraintTop_toBottomOf="@+id/detailReleaseDate" />
 
+        <ImageButton
+            android:id="@+id/favorite_icon"
+            android:layout_width="35dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="@+id/detailVoteAverage"
+            app:layout_constraintTop_toBottomOf="@+id/detailVoteAverage"
+            android:src="@drawable/heart_icon_off"
+            android:scaleType="centerCrop"
+            android:background="@color/trans"/>
+
         <TextView
             android:id="@+id/detailDescription"
             android:layout_width="match_parent"
@@ -89,7 +100,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:textSize="24dp"
+            android:textSize="24sp"
             android:text="@string/trailerLabel"
             app:layout_constraintStart_toStartOf="@+id/separator"
             app:layout_constraintTop_toTopOf="@+id/separator" />
@@ -131,7 +142,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:textSize="24dp"
+            android:textSize="24sp"
             android:text="@string/trailerReviews"
             app:layout_constraintStart_toStartOf="@+id/review_separator"
             app:layout_constraintTop_toTopOf="@+id/review_separator" />

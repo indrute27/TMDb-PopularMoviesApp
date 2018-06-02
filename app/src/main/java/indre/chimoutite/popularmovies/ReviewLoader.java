@@ -3,27 +3,26 @@ package indre.chimoutite.popularmovies;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by indre on 5/29/18. Custom loader.
+ * Created by indre on 6/2/18. Custom loader.
  */
 
-public class TrailerLoader extends AsyncTaskLoader<List<Trailer>> {
+public class ReviewLoader extends AsyncTaskLoader<List<Review>> {
 
     /** Tag for log messages */
-    private static final String LOG_TAG = TrailerLoader.class.getName();
+    private static final String LOG_TAG = ReviewLoader.class.getName();
 
     /** Query URL */
     private String mUrl;
 
     /**
-     * Constructs a new {@link TrailerLoader}.
+     * Constructs a new {@link ReviewLoader}.
      * @param context of the activity
      * @param url to load data from
      */
-    public TrailerLoader(Context context, String url) {
+    public ReviewLoader(Context context, String url) {
         super(context);
         mUrl = url;
     }
@@ -34,16 +33,16 @@ public class TrailerLoader extends AsyncTaskLoader<List<Trailer>> {
     }
 
     /**
-     * Load trailer data from the internet on a background thread
+     * Load review data from the internet on a background thread
      */
     @Override
-    public List<Trailer> loadInBackground() {
+    public List<Review> loadInBackground() {
         if (mUrl == null) {
             return null;
         }
 
         // Perform the network request, parse the response, and extract a list of trailers
-        return TrailerUtils.fetchTrailerID(mUrl);
+        return ReviewUtils.fetchReviews(mUrl);
     }
 }
 

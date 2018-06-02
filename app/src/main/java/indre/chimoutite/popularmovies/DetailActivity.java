@@ -7,9 +7,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,28 +17,48 @@ import com.squareup.picasso.Picasso;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by indre on 4/28/18. Activity shows the detail moview view.
  */
 
-public class DetailActivity extends AppCompatActivity implements TrailerAdapter.ItemClickListener, LoaderManager.LoaderCallbacks<ArrayList<String>> {
+public class DetailActivity extends AppCompatActivity implements TrailerAdapter.ItemClickListener {
 
     private URL trailerURL;
+    private URL reviewURL;
+    private boolean favoriteSelected = false;
 
     // Get a reference to the LoaderManager to interact with loaders
     private LoaderManager loaderManager = getLoaderManager();
 
-    // Initialize a new instance of the film adapter
-    private TrailerAdapter mAdapter;
+    // Initialize a new instance of the trailer and review adapters
+    private TrailerAdapter mAdapterTrailer;
+    private ReviewAdapter mAdapterReview;
 
-    // Set a constant value for the film loader ID
+    // Set a constant value for the trailer and review loader IDs
     private static final int TRAILER_LOADER_ID = 2;
+    private static final int REVIEW_LOADER_ID = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.movie_detail);
+
+        // Initialize the favorite button
+        final ImageButton favoriteButton = (ImageButton) findViewById(R.id.favorite_icon);
+        favoriteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (favoriteSelected) {
+                    favoriteSelected = false;
+                    favoriteButton.setImageResource(R.drawable.heart_icon_off);
+                } else {
+                    favoriteSelected = true;
+                    favoriteButton.setImageResource(R.drawable.heart_icon_on);
+                }
+            }
+        });
 
         // Add a back button
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -66,32 +86,46 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         overviewText.setText(overview);
         titleText.setText(title);
 
-        // Load in trailers
+        /**
+         * Load in trailers and reviews
+         */
+
+        // Create the new URLs based on selected film ID
         trailerURL = QueryUtils.createUrl(QueryUtils.universalVariables.URLMain + id
                 + "/videos" + QueryUtils.universalVariables.APIKey);
-        Log.v("DetailActivity", trailerURL.toString());
 
+        reviewURL = QueryUtils.createUrl(QueryUtils.universalVariables.URLMain + id
+                + "/reviews" + QueryUtils.universalVariables.APIKey);
 
         // Create a new adapter that takes an empty list of trailers as input
-        mAdapter = new TrailerAdapter(this, new ArrayList<String>());
+        mAdapterTrailer = new TrailerAdapter(this, new ArrayList<Trailer>());
+        mAdapterReview = new ReviewAdapter(this, new ArrayList<Review>());
+
 
         // Initialize the loader. Pass in the int ID constant defined above and pass in null for
         // the bundle. Pass in this activity for the LoaderCallbacks parameter.
-        loaderManager.initLoader(TRAILER_LOADER_ID, null, this);
+        getLoaderManager().initLoader(TRAILER_LOADER_ID, null, trailerLoaderListener);
+        getLoaderManager().initLoader(REVIEW_LOADER_ID, null, reviewLoaderListener);
 
-        // Get the trailer recycler view
-        RecyclerView recyclerView = findViewById(R.id.trailer_recycler_view);
+        // Get the trailer and review recycler views
+        RecyclerView recyclerViewTrailer = findViewById(R.id.trailer_recycler_view);
+        RecyclerView recyclerViewReview = findViewById(R.id.review_recycler_view);
 
-        // Implement recycler view
-        recyclerView.setHasFixedSize(true);
+        // Implement recycler views
+        recyclerViewTrailer.setHasFixedSize(true);
+        recyclerViewReview.setHasFixedSize(false);
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        RecyclerView.LayoutManager layoutManagerTrailer = new LinearLayoutManager(recyclerViewTrailer.getContext());
+        RecyclerView.LayoutManager layoutManagerReview = new LinearLayoutManager(recyclerViewReview.getContext());
 
-        recyclerView.setLayoutManager(layoutManager);
+        recyclerViewTrailer.setLayoutManager(layoutManagerTrailer);
+        recyclerViewReview.setLayoutManager(layoutManagerReview);
 
         // Create a new adapter that takes an empty list of trailers as input
-        recyclerView.setAdapter(mAdapter);
+        recyclerViewTrailer.setAdapter(mAdapterTrailer);
+        recyclerViewReview.setAdapter(mAdapterReview);
     }
+
 
     @Override
     public void onItemClick(View view, int position) {
@@ -108,19 +142,53 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         return super.onOptionsItemSelected(item);
     }
 
+    private LoaderManager.LoaderCallbacks<List<Trailer>> trailerLoaderListener =
+            new LoaderManager.LoaderCallbacks<List<Trailer>>() {
+        @Override
+        public Loader<List<Trailer>> onCreateLoader(int i, Bundle bundle) {
+            return new TrailerLoader(getApplicationContext(), trailerURL.toString());
+        }
+
+        @Override
+        public void onLoadFinished(Loader<List<Trailer>> loader, List<Trailer> newTrailers) {
+            // Clear the adapter of previous trailer data
+            mAdapterTrailer.swap(newTrailers);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<List<Trailer>> loader) {
+
+        }
+    };
+
+    private LoaderManager.LoaderCallbacks<List<Review>> reviewLoaderListener = new LoaderManager.LoaderCallbacks<List<Review>>() {
+        @Override
+        public Loader<List<Review>> onCreateLoader(int i, Bundle bundle) {
+            return new ReviewLoader(getApplicationContext(), reviewURL.toString());
+        }
+
+        @Override
+        public void onLoadFinished(Loader<List<Review>> loader, List<Review> newReviews) {
+            // Clear the adapter of previous review data
+            mAdapterReview.swap(newReviews);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<List<Review>> loader) {
+
+        }
+    };
+
     @Override
-    public Loader<ArrayList<String>> onCreateLoader(int i, Bundle bundle) {
-        Log.v("DetailActivity", "Loader Started!");
-        return new TrailerLoader(this, trailerURL.toString());
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
-    public void onLoadFinished(Loader<ArrayList<String>> loader, ArrayList<String> newTrailers) {
-        // Clear the adapter of previous film data
-        mAdapter.swap(newTrailers);
-    }
+    public void onRestoreInstanceState(Bundle savedInstanceState){
+        super.onRestoreInstanceState(savedInstanceState);
 
-    @Override
-    public void onLoaderReset(Loader<ArrayList<String>> loader) {
+        loaderManager.restartLoader(TRAILER_LOADER_ID, null, trailerLoaderListener);
+        loaderManager.restartLoader(REVIEW_LOADER_ID, null, reviewLoaderListener);
     }
 }
