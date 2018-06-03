@@ -33,7 +33,7 @@ public class QueryUtils {
     // Set global variables for URL and API key
     public interface universalVariables {
         public static final String URLMain = "http://api.themoviedb.org/3/movie/";
-        public static final String APIKey = "?api_key=49808a813bfba634b99f0929cbe16c51";
+        public static final String APIKey = "[private_key]";
     }
 
     /**

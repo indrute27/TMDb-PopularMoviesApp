@@ -28,6 +28,11 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private URL trailerURL;
     private URL reviewURL;
     private boolean favoriteSelected = false;
+    private static Bundle mBundleRecyclerViewState;
+    private RecyclerView recyclerViewTrailer;
+    private RecyclerView recyclerViewReview;
+    private final String TRAILER_KEY_RECYCLER_STATE = "TRAILER_RECYCLER_STATE";
+    private final String REVIEW_KEY_RECYCLER_STATE = "REVIEW_RECYCLER_STATE";
 
     // Get a reference to the LoaderManager to interact with loaders
     private LoaderManager loaderManager = getLoaderManager();
@@ -108,8 +113,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         getLoaderManager().initLoader(REVIEW_LOADER_ID, null, reviewLoaderListener);
 
         // Get the trailer and review recycler views
-        RecyclerView recyclerViewTrailer = findViewById(R.id.trailer_recycler_view);
-        RecyclerView recyclerViewReview = findViewById(R.id.review_recycler_view);
+        recyclerViewTrailer = findViewById(R.id.trailer_recycler_view);
+        recyclerViewReview = findViewById(R.id.review_recycler_view);
 
         // Implement recycler views
         recyclerViewTrailer.setHasFixedSize(true);
@@ -180,15 +185,12 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     };
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState){
         super.onRestoreInstanceState(savedInstanceState);
-
-        loaderManager.restartLoader(TRAILER_LOADER_ID, null, trailerLoaderListener);
-        loaderManager.restartLoader(REVIEW_LOADER_ID, null, reviewLoaderListener);
     }
 }
