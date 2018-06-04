@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,15 +29,16 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
     }
 
     @Override
-    public TrailerAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public TrailerAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.trailer_layout, viewGroup, false);
         trailerTitle = (TextView) view.findViewById(R.id.trailer_number);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(TrailerAdapter.ViewHolder viewHolder, int i) {
-        trailerTitle.setText(trailer.get(i).getmName());
+    public void onBindViewHolder(TrailerAdapter.ViewHolder viewHolder, int position) {
+        Log.d("tag","onBindViewHolder: called.");
+        trailerTitle.setText(trailer.get(position).getmName());
     }
 
     @Override

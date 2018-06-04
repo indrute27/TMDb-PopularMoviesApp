@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -38,6 +39,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     RecyclerView.LayoutManager layoutManagerTrailer;
     RecyclerView.LayoutManager layoutManagerReview;
 
+    private static final String TAG = "Detail Activity";
+
     // Get a reference to the LoaderManager to interact with loaders
     private LoaderManager loaderManager = getLoaderManager();
 
@@ -53,6 +56,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.movie_detail);
+
+        Log.d(TAG, "OnCreate started.");
 
         // Initialize the favorite button
         final ImageButton favoriteButton = (ImageButton) findViewById(R.id.favorite_icon);
@@ -119,7 +124,6 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             mAdapterTrailer = new TrailerAdapter(this, new ArrayList<Trailer>());
             mAdapterReview = new ReviewAdapter(this, new ArrayList<Review>());
 
-
             // Initialize the loader. Pass in the int ID constant defined above and pass in null for
             // the bundle. Pass in this activity for the LoaderCallbacks parameter.
             getLoaderManager().initLoader(TRAILER_LOADER_ID, null, trailerLoaderListener);
@@ -136,12 +140,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             layoutManagerTrailer = new LinearLayoutManager(recyclerViewTrailer.getContext());
             layoutManagerReview = new LinearLayoutManager(recyclerViewReview.getContext());
 
-            if (savedInstanceState != null){
-                recyclerViewTrailer.getLayoutManager().onRestoreInstanceState(savedInstanceState);
-            } else {
-                recyclerViewTrailer.setLayoutManager(layoutManagerTrailer);
-            }
-
+            recyclerViewTrailer.setLayoutManager(layoutManagerTrailer);
             recyclerViewReview.setLayoutManager(layoutManagerReview);
 
             // Create a new adapter that takes an empty list of trailers as input
@@ -149,7 +148,6 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             recyclerViewReview.setAdapter(mAdapterReview);
         }
     }
-
 
     @Override
     public void onItemClick(View view, int position) {
