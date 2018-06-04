@@ -35,8 +35,6 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private RecyclerView recyclerViewReview;
     private final String KEY_TRAILER_RECYCLER_STATE = "trailer_recycler_state";
     private final String KEY_REVIEW_RECYCLER_STATE = "review_recycler_state";
-    private static Bundle mBundleRecyclerViewTrailerState;
-    private static Bundle mBundleRecyclerViewReviewState;
     RecyclerView.LayoutManager layoutManagerTrailer;
     RecyclerView.LayoutManager layoutManagerReview;
 
@@ -138,7 +136,12 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             layoutManagerTrailer = new LinearLayoutManager(recyclerViewTrailer.getContext());
             layoutManagerReview = new LinearLayoutManager(recyclerViewReview.getContext());
 
-            recyclerViewTrailer.setLayoutManager(layoutManagerTrailer);
+            if (savedInstanceState != null){
+                recyclerViewTrailer.getLayoutManager().onRestoreInstanceState(savedInstanceState);
+            } else {
+                recyclerViewTrailer.setLayoutManager(layoutManagerTrailer);
+            }
+
             recyclerViewReview.setLayoutManager(layoutManagerReview);
 
             // Create a new adapter that takes an empty list of trailers as input
@@ -201,16 +204,15 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     };
 
     @Override
-    protected void onSaveInstanceState(Bundle mBundleRecyclerViewTrailerState) {
-        super.onSaveInstanceState(mBundleRecyclerViewTrailerState);
-        mBundleRecyclerViewTrailerState.putParcelable(
-                KEY_TRAILER_RECYCLER_STATE, layoutManagerTrailer.onSaveInstanceState());
+    protected void onSaveInstanceState(Bundle savedState) {
+        super.onSaveInstanceState(savedState);
+        savedState.putParcelable(
+                KEY_TRAILER_RECYCLER_STATE, recyclerViewTrailer.getLayoutManager().onSaveInstanceState());
     }
 
     @Override
-    public void onRestoreInstanceState(Bundle mBundleRecyclerViewTrailerState){
-        super.onRestoreInstanceState(mBundleRecyclerViewTrailerState);
-        layoutManagerTrailer.onRestoreInstanceState(mBundleRecyclerViewTrailerState.getParcelable(
-                KEY_TRAILER_RECYCLER_STATE));
+    public void onRestoreInstanceState(Bundle savedState){
+        super.onRestoreInstanceState(savedState);
+        recyclerViewTrailer.getLayoutManager().onRestoreInstanceState(savedState);
     }
 }
