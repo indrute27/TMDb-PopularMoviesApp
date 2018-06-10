@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity">
+            android:name=".UI.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,11 +22,11 @@
         </activity>
         <activity
             android:label="@string/detail_name"
-            android:name=".DetailActivity"
-            android:parentActivityName=".MainActivity">
+            android:name=".UI.DetailActivity"
+            android:parentActivityName=".UI.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".UI.MainActivity" />
         </activity>
     </application>
 

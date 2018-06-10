@@ -16,7 +16,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="8dp"
         android:textSize="16sp"
-        android:textColor="@color/colorPrimaryDark" />
+        android:textColor="@color/colorPrimaryDark"/>
 
     <TextView
         android:id="@+id/content"

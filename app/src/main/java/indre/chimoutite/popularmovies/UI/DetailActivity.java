@@ -1,6 +1,7 @@
-package indre.chimoutite.popularmovies;
+package indre.chimoutite.popularmovies.UI;
 
 import android.app.LoaderManager;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
@@ -23,6 +24,17 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import indre.chimoutite.popularmovies.R;
+import indre.chimoutite.popularmovies.database.FilmDataModel;
+import indre.chimoutite.popularmovies.FilmDataViewModel;
+import indre.chimoutite.popularmovies.loadersAndAdapters.ReviewAdapter;
+import indre.chimoutite.popularmovies.loadersAndAdapters.ReviewLoader;
+import indre.chimoutite.popularmovies.loadersAndAdapters.TrailerAdapter;
+import indre.chimoutite.popularmovies.loadersAndAdapters.TrailerLoader;
+import indre.chimoutite.popularmovies.network.QueryUtils;
+import indre.chimoutite.popularmovies.objects.Review;
+import indre.chimoutite.popularmovies.objects.Trailer;
+
 /**
  * Created by indre on 4/28/18. Activity shows the detail moview view.
  */
@@ -34,10 +46,12 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private boolean favoriteSelected = false;
     private RecyclerView recyclerViewTrailer;
     private RecyclerView recyclerViewReview;
-    private final String KEY_TRAILER_RECYCLER_STATE = "trailer_recycler_state";
-    private final String KEY_REVIEW_RECYCLER_STATE = "review_recycler_state";
+    //private final String KEY_TRAILER_RECYCLER_STATE = "trailer_recycler_state";
+    //private final String KEY_REVIEW_RECYCLER_STATE = "review_recycler_state";
     RecyclerView.LayoutManager layoutManagerTrailer;
     RecyclerView.LayoutManager layoutManagerReview;
+    private FilmDataViewModel viewModel;
+    private List<FilmDataModel> filmDataModelList;
 
     private static final String TAG = "Detail Activity";
 
@@ -58,21 +72,6 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         setContentView(R.layout.movie_detail);
 
         Log.d(TAG, "OnCreate started.");
-
-        // Initialize the favorite button
-        final ImageButton favoriteButton = (ImageButton) findViewById(R.id.favorite_icon);
-        favoriteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (favoriteSelected) {
-                    favoriteSelected = false;
-                    favoriteButton.setImageResource(R.drawable.heart_icon_off);
-                } else {
-                    favoriteSelected = true;
-                    favoriteButton.setImageResource(R.drawable.heart_icon_on);
-                }
-            }
-        });
 
         // Add a back button
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -104,6 +103,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
          * Load in trailers and reviews
          */
 
+
         // Get a reference to the ConnectivityManager to check state of network connectivity
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -113,6 +113,9 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
         // If there is a network connection, fetch data
         if (networkInfo != null && networkInfo.isConnected()) {
+
+            Log.d(TAG, "Verified that there is a network connection.");
+
             // Create the new URLs based on selected film ID
             trailerURL = QueryUtils.createUrl(QueryUtils.universalVariables.URLMain + id
                     + "/videos" + QueryUtils.universalVariables.APIKey);
@@ -123,6 +126,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             // Create a new adapter that takes an empty list of trailers as input
             mAdapterTrailer = new TrailerAdapter(this, new ArrayList<Trailer>());
             mAdapterReview = new ReviewAdapter(this, new ArrayList<Review>());
+
 
             // Initialize the loader. Pass in the int ID constant defined above and pass in null for
             // the bundle. Pass in this activity for the LoaderCallbacks parameter.
@@ -147,6 +151,30 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             recyclerViewTrailer.setAdapter(mAdapterTrailer);
             recyclerViewReview.setAdapter(mAdapterReview);
         }
+
+        //Setup the FilmViewModel
+        viewModel = ViewModelProviders.of(this).get(FilmDataViewModel.class);
+
+        // Initialize the favorite button
+        final ImageButton favoriteButton = findViewById(R.id.favorite_icon);
+        favoriteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "Favorite button pressed.");
+                final FilmDataModel filmDataModel = (FilmDataModel) view.getTag();
+                if (favoriteSelected) {
+                    Log.d(TAG, "Delete Item.");
+                    favoriteSelected = false;
+                    favoriteButton.setImageResource(R.drawable.heart_icon_off);
+                    viewModel.deleteItem(filmDataModel);
+                } else {
+                    Log.d(TAG, "Insert Item.");
+                    favoriteSelected = true;
+                    favoriteButton.setImageResource(R.drawable.heart_icon_on);
+                    viewModel.insertItem(filmDataModel);
+                }
+            }
+        });
     }
 
     @Override
@@ -166,24 +194,28 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
     private LoaderManager.LoaderCallbacks<List<Trailer>> trailerLoaderListener =
             new LoaderManager.LoaderCallbacks<List<Trailer>>() {
+
         @Override
         public Loader<List<Trailer>> onCreateLoader(int i, Bundle bundle) {
+            Log.d(TAG, "Trailer onCreateLoader called.");
             return new TrailerLoader(getApplicationContext(), trailerURL.toString());
         }
 
         @Override
         public void onLoadFinished(Loader<List<Trailer>> loader, List<Trailer> newTrailers) {
+            Log.d(TAG, "Trailer onLoadFinished called.");
             // Clear the adapter of previous trailer data
             mAdapterTrailer.swap(newTrailers);
         }
 
         @Override
         public void onLoaderReset(Loader<List<Trailer>> loader) {
-
+            Log.d(TAG, "Trailer onLoaderReset called.");
         }
     };
 
-    private LoaderManager.LoaderCallbacks<List<Review>> reviewLoaderListener = new LoaderManager.LoaderCallbacks<List<Review>>() {
+    private LoaderManager.LoaderCallbacks<List<Review>> reviewLoaderListener = new LoaderManager
+            .LoaderCallbacks<List<Review>>() {
         @Override
         public Loader<List<Review>> onCreateLoader(int i, Bundle bundle) {
             return new ReviewLoader(getApplicationContext(), reviewURL.toString());
@@ -201,16 +233,21 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         }
     };
 
-    @Override
-    protected void onSaveInstanceState(Bundle savedState) {
-        super.onSaveInstanceState(savedState);
-        savedState.putParcelable(
-                KEY_TRAILER_RECYCLER_STATE, recyclerViewTrailer.getLayoutManager().onSaveInstanceState());
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedState){
-        super.onRestoreInstanceState(savedState);
-        recyclerViewTrailer.getLayoutManager().onRestoreInstanceState(savedState);
-    }
+//    @Override
+//    protected void onSaveInstanceState(Bundle savedState) {
+//        Log.d(TAG, "onSaveInstanceState called.");
+//        super.onSaveInstanceState(savedState);
+//
+//        savedState.putParcelable(
+//                KEY_TRAILER_RECYCLER_STATE, recyclerViewTrailer.getLayoutManager()
+//                        .onSaveInstanceState());
+//    }
+//
+//    @Override
+//    public void onRestoreInstanceState(Bundle savedState){
+//        Log.d(TAG, "onRestoreInstanceState called.");
+//        super.onRestoreInstanceState(savedState);
+//        recyclerViewTrailer.getLayoutManager().onRestoreInstanceState(savedState
+//                .getParcelable(KEY_TRAILER_RECYCLER_STATE));
+//    }
 }

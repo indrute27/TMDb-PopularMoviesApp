@@ -1,4 +1,4 @@
-package indre.chimoutite.popularmovies;
+package indre.chimoutite.popularmovies.objects;
 
 /**
  * Created by indre on 6/2/18. Creates the film object.

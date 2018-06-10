@@ -1,4 +1,4 @@
-package indre.chimoutite.popularmovies;
+package indre.chimoutite.popularmovies.loadersAndAdapters;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -9,9 +9,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
+
+import indre.chimoutite.popularmovies.R;
+import indre.chimoutite.popularmovies.objects.Trailer;
 
 /**
  * Created by indre on 5/31/18. Custom adapter for trailers and recycler view.
@@ -20,7 +24,6 @@ import java.util.List;
 public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHolder> {
     private List<Trailer> trailer;
     private Context context;
-    TextView trailerTitle;
     private ItemClickListener mClickListener;
 
     public TrailerAdapter(Context context, List<Trailer> trailer) {
@@ -31,14 +34,13 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
     @Override
     public TrailerAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.trailer_layout, viewGroup, false);
-        trailerTitle = (TextView) view.findViewById(R.id.trailer_number);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(TrailerAdapter.ViewHolder viewHolder, int position) {
         Log.d("tag","onBindViewHolder: called.");
-        trailerTitle.setText(trailer.get(position).getmName());
+        viewHolder.trailerName.setText(trailer.get(position).getmName());
     }
 
     @Override
@@ -47,8 +49,12 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        public ViewHolder(View view) {
+        public TextView trailerName;
+        public ImageView playButton;
+        private ViewHolder(View view) {
             super(view);
+            trailerName = view.findViewById(R.id.trailerName);
+            playButton = view.findViewById(R.id.trailer_icon);
             itemView.setOnClickListener(this);
         }
 

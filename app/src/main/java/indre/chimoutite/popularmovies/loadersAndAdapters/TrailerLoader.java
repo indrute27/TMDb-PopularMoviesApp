@@ -1,10 +1,12 @@
-package indre.chimoutite.popularmovies;
+package indre.chimoutite.popularmovies.loadersAndAdapters;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import indre.chimoutite.popularmovies.network.TrailerUtils;
+import indre.chimoutite.popularmovies.objects.Trailer;
 
 /**
  * Created by indre on 5/29/18. Custom loader.

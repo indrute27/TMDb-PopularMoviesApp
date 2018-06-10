@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:background="@color/colorPrimaryDark"
-    tools:context="indre.chimoutite.popularmovies.MainActivity">
+    tools:context="indre.chimoutite.popularmovies.UI.MainActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/card_recycler_view"

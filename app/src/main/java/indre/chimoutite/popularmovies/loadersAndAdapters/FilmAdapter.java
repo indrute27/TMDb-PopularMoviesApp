@@ -1,4 +1,4 @@
-package indre.chimoutite.popularmovies;
+package indre.chimoutite.popularmovies.loadersAndAdapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +12,10 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import indre.chimoutite.popularmovies.R;
+import indre.chimoutite.popularmovies.UI.DetailActivity;
+import indre.chimoutite.popularmovies.objects.Film;
 
 /**
  * Created by indre on 4/28/18. Custom adapter for film object and recycler view.

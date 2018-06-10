@@ -1,4 +1,4 @@
-package indre.chimoutite.popularmovies;
+package indre.chimoutite.popularmovies.network;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -18,6 +18,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import indre.chimoutite.popularmovies.objects.Film;
+
 /**
  * Created by indre on 4/29/18. Based on code for "Did you feel it app" Udacity Basics
  * completed course.
@@ -33,7 +35,7 @@ public class QueryUtils {
     // Set global variables for URL and API key
     public interface universalVariables {
         public static final String URLMain = "http://api.themoviedb.org/3/movie/";
-        public static final String APIKey = "[private_key]";
+        public static final String APIKey = "?api_key=49808a813bfba634b99f0929cbe16c51";
     }
 
     /**
