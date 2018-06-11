@@ -7,17 +7,19 @@ import android.content.Context;
 
 @Database(entities = {FilmDataModel.class}, version = 1)
 public abstract class FilmDatabase extends RoomDatabase{
+
+    public abstract FilmDataModelDao filmDao();
     private static FilmDatabase INSTANCE;
 
     public static FilmDatabase getDatabase(final Context context) {
         synchronized (FilmDatabase.class) {
             if (INSTANCE == null) {
                 INSTANCE = Room.databaseBuilder(context.getApplicationContext(), FilmDatabase.class,
-                        "data_db").build();
+                        "film_db").build();
             }
         }
         return INSTANCE;
     }
 
-    public abstract FilmDataModelDao filmDetailsList();
+
 }

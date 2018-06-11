@@ -19,11 +19,17 @@ public class FilmDataViewModel extends AndroidViewModel {
         super(application);
 
         filmDatabase = FilmDatabase.getDatabase(this.getApplication());
-        mAllFilms = filmDatabase.filmDetailsList().getAllDataItems();
+        mAllFilms = filmDatabase.filmDao().getAllDataItems();
     }
 
     public LiveData<List<FilmDataModel>> getFilmData() {
         return mAllFilms;
+    }
+
+    // Find if the movie is already in the database
+    public boolean findFilm(String ID) {
+        if (filmDatabase.filmDao().inDatabase(ID)) {return true; };
+        return false;
     }
 
     // Insert item into the database in the background
@@ -40,7 +46,7 @@ public class FilmDataViewModel extends AndroidViewModel {
 
         @Override
         protected Void doInBackground(final FilmDataModel... params) {
-            db.filmDetailsList().addData(params[0]);
+            db.filmDao().addData(params[0]);
             return null;
         }
     }
@@ -59,7 +65,7 @@ public class FilmDataViewModel extends AndroidViewModel {
 
         @Override
         protected Void doInBackground(final FilmDataModel... params) {
-            db.filmDetailsList().deleteData(params[0]);
+            db.filmDao().deleteData(params[0]);
             return null;
         }
     }

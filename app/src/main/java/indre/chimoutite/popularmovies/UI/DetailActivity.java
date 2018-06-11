@@ -1,6 +1,7 @@
 package indre.chimoutite.popularmovies.UI;
 
 import android.app.LoaderManager;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.content.Loader;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -46,12 +48,9 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private boolean favoriteSelected = false;
     private RecyclerView recyclerViewTrailer;
     private RecyclerView recyclerViewReview;
-    //private final String KEY_TRAILER_RECYCLER_STATE = "trailer_recycler_state";
-    //private final String KEY_REVIEW_RECYCLER_STATE = "review_recycler_state";
     RecyclerView.LayoutManager layoutManagerTrailer;
     RecyclerView.LayoutManager layoutManagerReview;
     private FilmDataViewModel viewModel;
-    private List<FilmDataModel> filmDataModelList;
 
     private static final String TAG = "Detail Activity";
 
@@ -77,15 +76,15 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
-        String posterURL = intent.getExtras().getString("PosterURL");
-        String releaseDate = intent.getExtras().getString("ReleaseDate");
-        String voterAvg = intent.getExtras().getString("VoterAvg");
-        String overview = intent.getExtras().getString("Overview");
-        String title = intent.getExtras().getString("Title");
-        String id = intent.getExtras().getString("id");
+        final String posterURL = intent.getExtras().getString("PosterURL");
+        final String releaseDate = intent.getExtras().getString("ReleaseDate");
+        final String voterAvg = intent.getExtras().getString("VoterAvg");
+        final String overview = intent.getExtras().getString("Overview");
+        final String title = intent.getExtras().getString("Title");
+        final String id = intent.getExtras().getString("id");
 
         // Update UI with selected film data
-        ImageView posterImage = findViewById(R.id.detailPosterimageView);
+        final ImageView posterImage = findViewById(R.id.detailPosterimageView);
         TextView releaseDateText = findViewById(R.id.detailReleaseDate);
         TextView voterAvgText = findViewById(R.id.detailVoteAverage);
         TextView overviewText = findViewById(R.id.detailDescription);
@@ -154,14 +153,28 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
         //Setup the FilmViewModel
         viewModel = ViewModelProviders.of(this).get(FilmDataViewModel.class);
+        viewModel.getFilmData().observe(this, new Observer<List<FilmDataModel>>() {
+            @Override
+            public void onChanged(@Nullable List<FilmDataModel> filmDataModelList) {
+                // do something here later
+            }
+        });
+
+        //check if the movie is already in the database
+        favoriteSelected = viewModel.findFilm(id);
 
         // Initialize the favorite button
         final ImageButton favoriteButton = findViewById(R.id.favorite_icon);
+        if (favoriteSelected) {
+            favoriteButton.setImageResource(R.drawable.heart_icon_on);
+        }
+
         favoriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "Favorite button pressed.");
-                final FilmDataModel filmDataModel = (FilmDataModel) view.getTag();
+                FilmDataModel filmDataModel = new FilmDataModel(posterURL, releaseDate, voterAvg,
+                        overview, title, id, favoriteSelected);
                 if (favoriteSelected) {
                     Log.d(TAG, "Delete Item.");
                     favoriteSelected = false;
@@ -232,22 +245,4 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
         }
     };
-
-//    @Override
-//    protected void onSaveInstanceState(Bundle savedState) {
-//        Log.d(TAG, "onSaveInstanceState called.");
-//        super.onSaveInstanceState(savedState);
-//
-//        savedState.putParcelable(
-//                KEY_TRAILER_RECYCLER_STATE, recyclerViewTrailer.getLayoutManager()
-//                        .onSaveInstanceState());
-//    }
-//
-//    @Override
-//    public void onRestoreInstanceState(Bundle savedState){
-//        Log.d(TAG, "onRestoreInstanceState called.");
-//        super.onRestoreInstanceState(savedState);
-//        recyclerViewTrailer.getLayoutManager().onRestoreInstanceState(savedState
-//                .getParcelable(KEY_TRAILER_RECYCLER_STATE));
-//    }
 }

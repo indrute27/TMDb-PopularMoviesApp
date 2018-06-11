@@ -15,8 +15,8 @@ public interface FilmDataModelDao {
     @Query("select * from FilmDataModel")
     LiveData<List<FilmDataModel>> getAllDataItems();
 
-    @Query("select * from FilmDataModel where id = :id")
-    FilmDataModel getItemById(String id);
+    @Query("select favorite from FilmDataModel where filmID in(:currentId)")
+    boolean inDatabase(String currentId);
 
     @Insert(onConflict = REPLACE)
     void addData(FilmDataModel filmDataModel);
