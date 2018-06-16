@@ -67,7 +67,7 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.ViewHolder> {
             intent.putExtra("VoterAvg", film.get(getAdapterPosition()).getmVoteAverage());
             intent.putExtra("Overview", film.get(getAdapterPosition()).getmOverview());
             intent.putExtra("Title", film.get(getAdapterPosition()).getmTitle());
-            intent.putExtra("id", film.get(getAdapterPosition()).getmId());
+            intent.putExtra("filmId", film.get(getAdapterPosition()).getmFilmId());
             context.startActivity(intent);
         }
     }

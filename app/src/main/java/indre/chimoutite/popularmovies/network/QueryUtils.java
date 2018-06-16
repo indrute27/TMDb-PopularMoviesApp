@@ -34,8 +34,8 @@ public class QueryUtils {
 
     // Set global variables for URL and API key
     public interface universalVariables {
-        public static final String URLMain = "http://api.themoviedb.org/3/movie/";
-        public static final String APIKey = "?api_key=49808a813bfba634b99f0929cbe16c51";
+        String URLMain = "http://api.themoviedb.org/3/movie/";
+        String APIKey = "?api_key=49808a813bfba634b99f0929cbe16c51";
     }
 
     /**
@@ -174,12 +174,12 @@ public class QueryUtils {
                 String posterUrl = "http://image.tmdb.org/t/p/w185" + currentFilm.getString("poster_path");
                 String overview = currentFilm.getString("overview");
                 String releaseDate = currentFilm.getString("release_date");
-                String id = currentFilm.getString("id");
+                int filmId = currentFilm.getInt("id");
 
                 // Create a new {@link Film} object with the vote count, vote average, title,
                 // popularity, poster path, overview, and release date from the JSON response
                 Film film = new Film(voteCount, voteAverage, title, popularity, posterUrl,
-                        overview, releaseDate, id);
+                        overview, releaseDate, filmId);
 
                 // Add the new {@link Film} to the list of movies
                 films.add(film);

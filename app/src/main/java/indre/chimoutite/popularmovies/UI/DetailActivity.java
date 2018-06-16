@@ -1,6 +1,7 @@
 package indre.chimoutite.popularmovies.UI;
 
 import android.app.LoaderManager;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -26,9 +27,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import indre.chimoutite.popularmovies.FilmDataViewModel;
 import indre.chimoutite.popularmovies.R;
 import indre.chimoutite.popularmovies.database.FilmDataModel;
-import indre.chimoutite.popularmovies.FilmDataViewModel;
 import indre.chimoutite.popularmovies.loadersAndAdapters.ReviewAdapter;
 import indre.chimoutite.popularmovies.loadersAndAdapters.ReviewLoader;
 import indre.chimoutite.popularmovies.loadersAndAdapters.TrailerAdapter;
@@ -45,12 +46,11 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
     private URL trailerURL;
     private URL reviewURL;
-    private boolean favoriteSelected = false;
+    private boolean favoriteSelected;
     private RecyclerView recyclerViewTrailer;
     private RecyclerView recyclerViewReview;
     RecyclerView.LayoutManager layoutManagerTrailer;
     RecyclerView.LayoutManager layoutManagerReview;
-    private FilmDataViewModel viewModel;
 
     private static final String TAG = "Detail Activity";
 
@@ -64,6 +64,10 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     // Set a constant value for the trailer and review loader IDs
     private static final int TRAILER_LOADER_ID = 2;
     private static final int REVIEW_LOADER_ID = 3;
+
+    // Database variables
+    private FilmDataViewModel viewModel;
+    private LiveData<FilmDataModel> film;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +85,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         final String voterAvg = intent.getExtras().getString("VoterAvg");
         final String overview = intent.getExtras().getString("Overview");
         final String title = intent.getExtras().getString("Title");
-        final String id = intent.getExtras().getString("id");
+        final int filmId = intent.getExtras().getInt("filmId");
 
         // Update UI with selected film data
         final ImageView posterImage = findViewById(R.id.detailPosterimageView);
@@ -102,7 +106,6 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
          * Load in trailers and reviews
          */
 
-
         // Get a reference to the ConnectivityManager to check state of network connectivity
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -116,10 +119,10 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             Log.d(TAG, "Verified that there is a network connection.");
 
             // Create the new URLs based on selected film ID
-            trailerURL = QueryUtils.createUrl(QueryUtils.universalVariables.URLMain + id
+            trailerURL = QueryUtils.createUrl(QueryUtils.universalVariables.URLMain + filmId
                     + "/videos" + QueryUtils.universalVariables.APIKey);
 
-            reviewURL = QueryUtils.createUrl(QueryUtils.universalVariables.URLMain + id
+            reviewURL = QueryUtils.createUrl(QueryUtils.universalVariables.URLMain + filmId
                     + "/reviews" + QueryUtils.universalVariables.APIKey);
 
             // Create a new adapter that takes an empty list of trailers as input
@@ -153,20 +156,24 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
         //Setup the FilmViewModel
         viewModel = ViewModelProviders.of(this).get(FilmDataViewModel.class);
-        viewModel.getFilmData().observe(this, new Observer<List<FilmDataModel>>() {
+        viewModel.loadAllFilms().observe(DetailActivity.this, new Observer<List<FilmDataModel>>() {
             @Override
             public void onChanged(@Nullable List<FilmDataModel> filmDataModelList) {
-                // do something here later
+                if (viewModel.loadFilmById(filmId).getValue() != null){
+                    film = viewModel.loadFilmById(filmId);
+                    Log.d(TAG, "onChanged: " + film.getValue().getFilmId());
+                } else {
+                    Log.d(TAG, "onChanged: Null");
+                }
             }
         });
 
-        //check if the movie is already in the database
-        favoriteSelected = viewModel.findFilm(id);
-
-        // Initialize the favorite button
         final ImageButton favoriteButton = findViewById(R.id.favorite_icon);
-        if (favoriteSelected) {
+
+        if (film != null) {
+            favoriteSelected = true;
             favoriteButton.setImageResource(R.drawable.heart_icon_on);
+            //mDb.filmDao().updateFilm(film);
         }
 
         favoriteButton.setOnClickListener(new View.OnClickListener() {
@@ -174,17 +181,17 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             public void onClick(View view) {
                 Log.d(TAG, "Favorite button pressed.");
                 FilmDataModel filmDataModel = new FilmDataModel(posterURL, releaseDate, voterAvg,
-                        overview, title, id, favoriteSelected);
+                        overview, title, filmId);
                 if (favoriteSelected) {
                     Log.d(TAG, "Delete Item.");
                     favoriteSelected = false;
                     favoriteButton.setImageResource(R.drawable.heart_icon_off);
-                    viewModel.deleteItem(filmDataModel);
+                    viewModel.deleteFilm(filmDataModel);
                 } else {
                     Log.d(TAG, "Insert Item.");
                     favoriteSelected = true;
                     favoriteButton.setImageResource(R.drawable.heart_icon_on);
-                    viewModel.insertItem(filmDataModel);
+                    viewModel.insertFilm(filmDataModel);
                 }
             }
         });

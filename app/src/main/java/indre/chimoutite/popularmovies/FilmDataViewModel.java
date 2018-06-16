@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.util.List;
 
@@ -15,25 +16,28 @@ public class FilmDataViewModel extends AndroidViewModel {
     private FilmDatabase filmDatabase;
     private final LiveData<List<FilmDataModel>> mAllFilms;
 
+    // Constant for logging
+    private static final String TAG = FilmDataViewModel.class.getSimpleName();
+
     public FilmDataViewModel(Application application) {
         super(application);
 
         filmDatabase = FilmDatabase.getDatabase(this.getApplication());
-        mAllFilms = filmDatabase.filmDao().getAllDataItems();
+        mAllFilms = filmDatabase.filmDao().loadAllFilms();
+        Log.d(TAG, "FilmDataViewModel: Room Db loaded");
     }
 
-    public LiveData<List<FilmDataModel>> getFilmData() {
+    public LiveData<List<FilmDataModel>> loadAllFilms() {
         return mAllFilms;
     }
 
-    // Find if the movie is already in the database
-    public boolean findFilm(String ID) {
-        if (filmDatabase.filmDao().inDatabase(ID)) {return true; };
-        return false;
+    public LiveData<FilmDataModel> loadFilmById (int filmId) {
+        return filmDatabase.filmDao().loadFilmById(filmId);
     }
 
     // Insert item into the database in the background
-    public void insertItem(FilmDataModel filmDataModel) {
+    public void insertFilm(FilmDataModel filmDataModel) {
+        Log.d(TAG, "insertFilm being accessed.");
         new insertAsyncTask(filmDatabase).execute(filmDataModel);
     }
 
@@ -46,13 +50,14 @@ public class FilmDataViewModel extends AndroidViewModel {
 
         @Override
         protected Void doInBackground(final FilmDataModel... params) {
-            db.filmDao().addData(params[0]);
+            db.filmDao().addFilm(params[0]);
             return null;
         }
     }
 
     // Delete item from the database in the background
-    public void deleteItem(FilmDataModel filmDataModel) {
+    public void deleteFilm(FilmDataModel filmDataModel) {
+        Log.d(TAG, "deleteFilm being accessed.");
         new deleteAsyncTask(filmDatabase).execute(filmDataModel);
     }
 
@@ -65,7 +70,7 @@ public class FilmDataViewModel extends AndroidViewModel {
 
         @Override
         protected Void doInBackground(final FilmDataModel... params) {
-            db.filmDao().deleteData(params[0]);
+            db.filmDao().deleteFilm(params[0]);
             return null;
         }
     }

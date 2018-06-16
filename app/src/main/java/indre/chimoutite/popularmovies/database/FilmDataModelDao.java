@@ -12,15 +12,18 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
 @Dao
 public interface FilmDataModelDao {
-    @Query("select * from FilmDataModel")
-    LiveData<List<FilmDataModel>> getAllDataItems();
-
-    @Query("select favorite from FilmDataModel where filmID in(:currentId)")
-    boolean inDatabase(String currentId);
+    @Query("select * from film ORDER BY title")
+    LiveData<List<FilmDataModel>> loadAllFilms();
 
     @Insert(onConflict = REPLACE)
-    void addData(FilmDataModel filmDataModel);
+    void addFilm(FilmDataModel filmDataModel);
 
     @Delete
-    void deleteData(FilmDataModel filmDataModel);
+    void deleteFilm(FilmDataModel filmDataModel);
+
+//    @Update(onConflict = onConflictStrategy.REPLACE)
+//    void updateFilm(FilmDataModel filmDataModel);
+
+    @Query("SELECT * FROM film WHERE filmId = :filmId")
+    LiveData<FilmDataModel> loadFilmById(int filmId);
 }
